@@ -45,7 +45,7 @@ func (repo *BookRepository) FindAllBooks() ([]Book, error){
 
 func (repo *BookRepository) FindBookByID(id string) (*Book, error) {
     var b Book
-    err := repo.DB.QueryRow("SELECT * FROM library_sys.Books WHERE id = ?", id).Scan(&b.ID, &b.Title, &b.Author, &b.Genre)
+    err := repo.DB.QueryRow("SELECT id, title, author, genre FROM library_sys.Books WHERE id = $1", id).Scan(&b.ID, &b.Title, &b.Author, &b.Genre)
     if err != nil {
         return nil, err
     }
@@ -54,12 +54,13 @@ func (repo *BookRepository) FindBookByID(id string) (*Book, error) {
 
 }
 
-
-func (repo *BookRepository) RegisterBook(book Book) {
-    sqlStatement := "INSERT INTO library_sys.Books (id, title, author, genre) VALUES (?, ?, ?, ?)"
-    _, err := repo.DB.Exec(sqlStatement, book.ID, book.Title, book.Author, book.Genre)
+func (repo *BookRepository) RegisterBook(id, title, author, genre string) error {
+    sqlStatement := "INSERT INTO library_sys.Books (id, title, author, genre) VALUES ($1, $2, $3, $4)"
+    _, err := repo.DB.Exec(sqlStatement, id, title, author, genre)
     if err != nil {
         log.Fatal(err)
-        return
+        return err
     }
+
+    return nil
 }

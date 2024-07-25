@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/ianrr/library/internal/auth"
@@ -11,7 +12,6 @@ import (
 
 
 type APIBook struct {
-    db.Book
     ID      string `json:"id"`
     Title   string `json:"title"` 
     Author  string `json:"author"`
@@ -69,11 +69,19 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
     if !h.IsTest {
         checkAuth(w, r)
     }
-    id := r.FormValue("id")
+
+    id := r.PathValue("id")
 
     book, err := h.Repo.FindBookByID(id)
     if err != nil {
-        http.Error(w, "Error retrieving book", http.StatusInternalServerError)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+
+    if book == nil {
+        http.NotFound(w, r)
+        return
     }
 
     w.Header().Set("Content-Type", "application/json")
@@ -84,12 +92,8 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// TODO: Implement Add book
-func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request) {
-    if !h.IsTest {
-        checkAuth(w, r)
-    }
-    
+func (h *BookHandler) SubmitBook(w http.ResponseWriter, r *http.Request) {
+
     var book APIBook
     err := json.NewDecoder(r.Body).Decode(&book)
     if err != nil {
@@ -97,4 +101,16 @@ func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    if book.ID == "" || book.Title == "" || book.Author == "" ||book.Genre == "" {
+        http.Error(w, "Missing required field(s)", http.StatusBadRequest)
+        return
+    }
+
+    err = h.Repo.RegisterBook(book.ID, book.Title, book.Author, book.Genre)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+
+     log.Println("Successfuly added book")
+     w.WriteHeader(http.StatusCreated)
 }
