@@ -16,6 +16,8 @@ type APIBook struct {
     Title   string `json:"title"` 
     Author  string `json:"author"`
     Genre   string `json:"genre"`
+    Pages   int    `json:"pages"` 
+    Stock   int    `json:"stock"` 
 }
 
 
@@ -91,6 +93,37 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func (h *BookHandler) SearchBook(w http.ResponseWriter, r *http.Request) {
+    if !h.IsTest {
+        checkAuth(w, r)
+    }
+ 
+    err := r.ParseMultipartForm(32 << 20)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    identifier := r.FormValue("identifier")
+
+    book, err := h.Repo.FindBookByIdentifier(identifier)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    if book == nil {
+        http.NotFound(w, r)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(book); err != nil {
+        http.Error(w, "Error encoding json", http.StatusInternalServerError)
+        return
+    }
+}
+
 
 func (h *BookHandler) SubmitBook(w http.ResponseWriter, r *http.Request) {
 
@@ -101,12 +134,12 @@ func (h *BookHandler) SubmitBook(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if book.Title == "" || book.Author == "" ||book.Genre == "" {
+    if book.Title == "" || book.Author == "" || book.Genre == "" {
         http.Error(w, "Missing required field(s)", http.StatusBadRequest)
         return
     }
 
-    err = h.Repo.RegisterBook(book.Title, book.Author, book.Genre)
+    err = h.Repo.RegisterBook(book.Title, book.Author, book.Genre, book.Pages)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
     }
