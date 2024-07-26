@@ -1,9 +1,10 @@
 package db
 
 type BookRepositoryInterface interface {
-    RegisterBook(title, author, genre string) error
+    RegisterBook(title, author, genre string, pages int) error
     FindAllBooks() ([]Book, error)
     FindBookByID(id string) (*Book, error)
+    FindBookByIdentifier(identifier string) (*Book, error)
 }
 
 

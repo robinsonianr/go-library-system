@@ -30,9 +30,11 @@ func initServer() {
     r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         w.Write([]byte("Hello, World!"))
     })
+    log.Println("Server at http://localhost:8080 running")
 
     // methods of bookhandler as HTTP handlers
     r.Get("/books", bookHandler.GetBooks)
+    r.Get("/book/search", bookHandler.SearchBook)
     r.Get("/book/{id}", bookHandler.GetBook)
     r.Post("/book", bookHandler.SubmitBook)
 
@@ -45,6 +47,5 @@ func initServer() {
 
 
 func main() {
-    log.Println("Hello, World!")
     initServer()
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ianrr/library/internal/auth"
+	"github.com/ianrr/library/internal/db"
 	"github.com/ianrr/library/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,6 +22,7 @@ type User struct {
     Username    string
     Email       string
     Password    string
+    Books       []db.Book
 }
 
 var UserNotFound = errors.New("User not found")

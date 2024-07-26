@@ -20,7 +20,9 @@ func NewDb() (*sql.DB, error){
         ID TEXT PRIMARY KEY,
         Title TEXT NOT NULL,
         Author TEXT NOT NULL,
-        Genre TEXT NOT NULL
+        Genre TEXT NOT NULL,
+        Pages INT NOT NULL,
+        Stock INT
     );
     
     CREATE TABLE IF NOT EXISTS "library_sys".User (
@@ -28,10 +30,8 @@ func NewDb() (*sql.DB, error){
         Username TEXT NOT NULL,
         Email TEXT NOT NULL,
         Password TEXT NOT NULL
-    );
-    `
 
-
+    );`
 
     _, err = db.Exec(createTablesSQL)
     if err != nil {
