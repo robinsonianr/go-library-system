@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/ianrr/library/internal/api"
 	"github.com/ianrr/library/internal/db"
+	"github.com/ianrr/library/internal/db/user"
 )
 
 func initServer() {
@@ -17,8 +18,10 @@ func initServer() {
     }
     
     bookRepo := &db.BookRepository{DB: database}
+    userRepo := &user.UserRepository{DB: database}
 
-    bookHandler := &api.BookHandler{Repo: bookRepo, IsTest: true}
+    bookHandler := &api.BookHandler{Repo: bookRepo, IsTest: false}
+    userHandler := &api.UserHandler{Repo: userRepo}
 
     
     r := chi.NewRouter()
@@ -32,6 +35,10 @@ func initServer() {
     r.Get("/books", bookHandler.GetBooks)
     r.Get("/book/{id}", bookHandler.GetBook)
     r.Post("/book", bookHandler.SubmitBook)
+
+    // methods of userhandlers as HTTP handlers
+    r.Post("/user", userHandler.RegisterUser)
+    r.Post("/user/login", userHandler.LoginUser)
     
     http.ListenAndServe(":8080", r)
 }
