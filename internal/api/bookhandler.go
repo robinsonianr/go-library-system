@@ -32,9 +32,9 @@ func checkAuth(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    secret, err := utils.ReadFile("../../privatekey.txt")
+    secret, err := utils.ReadFile("../../privateKey.txt")
     if err != nil {
-        http.Error(w, "Error reading token", http.StatusInternalServerError)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
@@ -101,12 +101,12 @@ func (h *BookHandler) SubmitBook(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if book.ID == "" || book.Title == "" || book.Author == "" ||book.Genre == "" {
+    if book.Title == "" || book.Author == "" ||book.Genre == "" {
         http.Error(w, "Missing required field(s)", http.StatusBadRequest)
         return
     }
 
-    err = h.Repo.RegisterBook(book.ID, book.Title, book.Author, book.Genre)
+    err = h.Repo.RegisterBook(book.Title, book.Author, book.Genre)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
     }

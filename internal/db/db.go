@@ -16,14 +16,24 @@ func NewDb() (*sql.DB, error){
         return nil, err
     }
 
-    createTableSQL := `CREATE TABLE IF NOT EXISTS "library_sys".Books (
+    createTablesSQL := `CREATE TABLE IF NOT EXISTS "library_sys".Books (
         ID TEXT PRIMARY KEY,
         Title TEXT NOT NULL,
         Author TEXT NOT NULL,
         Genre TEXT NOT NULL
-    );`
+    );
+    
+    CREATE TABLE IF NOT EXISTS "library_sys".User (
+        ID TEXT PRIMARY KEY,
+        Username TEXT NOT NULL,
+        Email TEXT NOT NULL,
+        Password TEXT NOT NULL
+    );
+    `
 
-    _, err = db.Exec(createTableSQL)
+
+
+    _, err = db.Exec(createTablesSQL)
     if err != nil {
         panic(err)
     }

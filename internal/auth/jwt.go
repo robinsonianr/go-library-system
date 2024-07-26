@@ -40,6 +40,8 @@ func IsValid(token string, secretKey string) bool {
     _, err := jwt.Parse(token, func (token *jwt.Token) (interface{}, error) {
         return []byte(secretKey), nil
     })
-    
-    return err == nil
+   if err != nil {
+		return false
+	}
+	return true
 }

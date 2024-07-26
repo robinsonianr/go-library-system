@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+
+	"github.com/google/uuid"
 )
 
-var ErrNotFound = errors.New("book not found")
+var ErrNotFound = errors.New("Book not found")
 
 type BookRepository struct {
     DB *sql.DB
@@ -54,7 +56,9 @@ func (repo *BookRepository) FindBookByID(id string) (*Book, error) {
 
 }
 
-func (repo *BookRepository) RegisterBook(id, title, author, genre string) error {
+func (repo *BookRepository) RegisterBook(title, author, genre string) error {
+    id := uuid.New().String()
+
     sqlStatement := "INSERT INTO library_sys.Books (id, title, author, genre) VALUES ($1, $2, $3, $4)"
     _, err := repo.DB.Exec(sqlStatement, id, title, author, genre)
     if err != nil {
